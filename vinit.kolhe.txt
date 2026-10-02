@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Smart Soil Health Checker</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#f1f8e9;
+    color:#222;
+}
+
+header{
+    background:#2e7d32;
+    color:white;
+    text-align:center;
+    padding:25px 15px;
+}
+
+header h1{
+    margin:0 0 8px;
+}
+
+header p{
+    margin:0;
+}
+
+.language{
+    text-align:center;
+    padding:12px;
+    background:white;
+}
+
+.language button{
+    margin:4px;
+    padding:8px 15px;
+    border:none;
+    border-radius:6px;
+    background:#388e3c;
+    color:white;
+    cursor:pointer;
+}
+
+.container{
+    max-width:750px;
+    margin:20px auto;
+    padding:10px;
+}
+
+.card{
+    background:white;
+    padding:22px;
+    margin-bottom:20px;
+    border-radius:12px;
+    box-shadow:0 3px 12px rgba(0,0,0,0.10);
+}
+
+h2{
+    color:#2e7d32;
+    margin-top:0;
+}
+
+label{
+    display:block;
+    margin-top:14px;
+    font-weight:bold;
+}
+
+input,
+select{
+    width:100%;
+    padding:11px;
+    margin-top:6px;
+    border:1px solid #bbb;
+    border-radius:6px;
+    font-size:15px;
+}
+
+.main-button{
+    width:100%;
+    background:#2e7d32;
+    color:white;
+    border:none;
+    padding:13px;
+    margin-top:22px;
+    border-radius:7px;
+    cursor:pointer;
+    font-size:17px;
+}
+
+.main-button:hover{
+    background:#1b5e20;
+}
+
+.result{
+    line-height:1.9;
+    font-size:16px;
+}
+
+.low{
+    color:red;
+    font-weight:bold;
+}
+
+.normal{
+    color:green;
+    font-weight:bold;
+}
+
+.warning{
+    background:#fff3cd;
+    padding:14px;
+    border-radius:8px;
+    line-height:1.6;
+}
+
+.report-header{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.report-header h2{
+    margin-bottom:5px;
+}
+
+.info-box{
+    background:#f5f5f5;
+    padding:12px;
+    border-radius:8px;
+    line-height:1.8;
+}
+
+hr{
+    border:none;
+    border-top:1px solid #ddd;
+    margin:22px 0;
+}
+
+.print-button{
+    background:#1565c0;
+    color:white;
+    border:none;
+    padding:12px 18px;
+    border-radius:7px;
+    cursor:pointer;
+    font-size:16px;
+    margin-top:20px;
+}
+
+#report{
+    display:none;
+}
+
+
+/* PRINT / SAVE AS PDF */
+
+@media print{
+
+    body{
+        background:white;
+    }
+
+    header,
+    .language,
+    .form-card,
+    .warning,
+    #printBtn{
+        display:none !important;
+    }
+
+    .container{
+        max-width:100%;
+        margin:0;
+        padding:0;
+    }
+
+    #report{
+        display:block !important;
+        box-shadow:none;
+        border:1px solid #333;
+        padding:25px;
+    }
+
+    .print-button{
+        display:none !important;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<header>
+
+<h1>🌱 Smart Soil Health Checker</h1>
+
+<p id="headerSubtitle">
+Check your soil health easily
+</p>
+
+</header>
+
+
+<div class="language">
+
+<button onclick="setLanguage('en')">
+English
+</button>
+
+<button onclick="setLanguage('hi')">
+हिंदी
+</button>
+
+</div>
+
+
+<div class="container">
+
+
+<!-- INPUT FORM -->
+
+<div class="card form-card">
+
+<h2 id="formTitle">
+Soil Test Details
+</h2>
+
+
+<label id="farmerLabel">
+Farmer Name
+</label>
+
+<input
+type="text"
+id="farmerName"
+placeholder="Enter farmer name"
+>
+
+
+<label id="villageLabel">
+Village
+</label>
+
+<input
+type="text"
+id="village"
+placeholder="Enter village name"
+>
+
+
+<label id="dateLabel">
+Date
+</label>
+
+<input
+type="date"
+id="date"
+>
+
+
+<label id="cropLabel">
+Select Crop
+</label>
+
+<select id="crop">
+
+<option value="orange">
+Orange
+</option>
+
+<option value="wheat">
+Wheat
+</option>
+
+<option value="soybean">
+Soybean
+</option>
+
+<option value="chilli">
+Chilli
+</option>
+
+</select>
+
+
+<label id="stageLabel">
+Crop Stage
+</label>
+
+<select id="stage">
+
+<option value="flowering">
+Flowering
+</option>
+
+<option value="fruit_setting">
+Fruit Setting
+</option>
+
+<option value="fruit_development">
+Fruit Development
+</option>
+
+<option value="harvesting">
+Harvesting
+</option>
+
+</select>
+
+
+<label>
+Soil pH
+</label>
+
+<input
+type="number"
+id="ph"
+step="0.1"
+placeholder="Example: 7.0"
+>
+
+
+<label>
+Nitrogen (N)
+</label>
+
+<input
+type="number"
+id="n"
+placeholder="Enter soil test value"
+>
+
+
+<label>
+Phosphorus (P)
+</label>
+
+<input
+type="number"
+id="p"
+placeholder="Enter soil test value"
+>
+
+
+<label>
+Potassium (K)
+</label>
+
+<input
+type="number"
+id="k"
+placeholder="Enter soil test value"
+>
+
+
+<label>
+Zinc (Zn)
+</label>
+
+<input
+type="number"
+id="zn"
+step="0.1"
+placeholder="Enter soil test value"
+>
+
+
+<label>
+Iron (Fe)
+</label>
+
+<input
+type="number"
+id="fe"
+step="0.1"
+placeholder="Enter soil test value"
+>
+
+
+<button
+class="main-button"
+onclick="checkSoil()"
+id="checkButton"
+>
+Check Soil Health
+</button>
+
+</div>
+
+
+
+<!-- REPORT -->
+
+<div class="card" id="report">
+
+
+<div class="report-header">
+
+<h2>
+🌱 Smart Soil Health Report
+</h2>
+
+<p id="reportSubtitle">
+Soil analysis and general recommendation
+</p>
+
+</div>
+
+
+<h2 id="farmerDetailsTitle">
+Farmer Details
+</h2>
+
+
+<div class="info-box">
+
+<p>
+<b id="rFarmerLabel">
+Farmer Name:
+</b>
+
+<span id="rFarmer">
+-
+</span>
+</p>
+
+
+<p>
+<b id="rVillageLabel">
+Village:
+</b>
+
+<span id="rVillage">
+-
+</span>
+</p>
+
+
+<p>
+<b id="rDateLabel">
+Date:
+</b>
+
+<span id="rDate">
+-
+</span>
+</p>
+
+
+<p>
+<b id="rCropLabel">
+Crop:
+</b>
+
+<span id="rCrop">
+-
+</span>
+</p>
+
+
+<p>
+<b id="rStageLabel">
+Crop Stage:
+</b>
+
+<span id="rStage">
+-
+</span>
+</p>
+
+</div>
+
+
+<hr>
+
+
+<h2 id="soilResultTitle">
+Soil Health Result
+</h2>
+
+
+<div
+class="result"
+id="result"
+>
+</div>
+
+
+<hr>
+
+
+<h2 id="recommendTitle">
+Smart Recommendation
+</h2>
+
+
+<div
+class="result"
+id="recommendation"
+>
+</div>
+
+
+<button
+class="print-button"
+id="printBtn"
+onclick="window.print()"
+>
+🖨️ Print / Save as PDF
+</button>
+
+
+</div>
+
+
+<div class="warning" id="warning">
+
+⚠️ This app provides general guidance based on entered soil-test values.
+For actual fertilizer application, use a proper soil test and local agricultural recommendations.
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+
+// -------------------------
+// DEFAULT DATE
+// -------------------------
+
+document.getElementById("date").value =
+new Date().toISOString().split("T")[0];
+
+
+// -------------------------
+// CROP STAGES
+// -------------------------
+
+const stages = {
+
+orange: {
+
+flowering: "Flowering",
+
+fruit_setting: "Fruit Setting",
+
+fruit_development: "Fruit Development",
+
+harvesting: "Harvesting"
+
+},
+
+wheat: {
+
+flowering: "Flowering",
+
+fruit_setting: "Tillering",
+
+fruit_development: "Grain Development",
+
+harvesting: "Harvesting"
+
+},
+
+soybean: {
+
+flowering: "Flowering",
+
+fruit_setting: "Pod Setting",
+
+fruit_development: "Pod Development",
+
+harvesting: "Harvesting"
+
+},
+
+chilli: {
+
+flowering: "Flowering",
+
+fruit_setting: "Fruit Setting",
+
+fruit_development: "Fruit Development",
+
+harvesting: "Harvesting"
+
+}
+
+};
+
+
+// -------------------------
+// CROP CHANGE
+// -------------------------
+
+document.getElementById("crop")
+.addEventListener("change", updateStages);
+
+
+function updateStages(){
+
+let crop =
+document.getElementById("crop").value;
+
+let stageSelect =
+document.getElementById("stage");
+
+stageSelect.innerHTML = "";
+
+for(let key in stages[crop]){
+
+let option =
+document.createElement("option");
+
+option.value = key;
+
+option.textContent =
+stages[crop][key];
+
+stageSelect.appendChild(option);
+
+}
+
+}
+
+
+// -------------------------
+// LANGUAGE
+// -------------------------
+
+let language = "en";
+
+
+function setLanguage(lang){
+
+language = lang;
+
+
+if(lang === "hi"){
+
+document.getElementById("headerSubtitle").innerText =
+"आसानी से अपनी मिट्टी की जांच करें";
+
+document.getElementById("formTitle").innerText =
+"मिट्टी जांच विवरण";
+
+document.getElementById("farmerLabel").innerText =
+"किसान का नाम";
+
+document.getElementById("villageLabel").innerText =
+"गांव";
+
+document.getElementById("dateLabel").innerText =
+"तारीख";
+
+document.getElementById("cropLabel").innerText =
+"फसल चुनें";
+
+document.getElementById("stageLabel").innerText =
+"फसल की अवस्था";
+
+document.getElementById("farmerName").placeholder =
+"किसान का नाम लिखें";
+
+document.getElementById("village").placeholder =
+"गांव का नाम लिखें";
+
+document.getElementById("checkButton").innerText =
+"मिट्टी की जांच करें";
+
+document.getElementById("farmerDetailsTitle").innerText =
+"किसान का विवरण";
+
+document.getElementById("rFarmerLabel").innerText =
+"किसान का नाम:";
+
+document.getElementById("rVillageLabel").innerText =
+"गांव:";
+
+document.getElementById("rDateLabel").innerText =
+"तारीख:";
+
+document.getElementById("rCropLabel").innerText =
+"फसल:";
+
+document.getElementById("rStageLabel").innerText =
+"फसल की अवस्था:";
+
+document.getElementById("soilResultTitle").innerText =
+"मिट्टी की स्थिति";
+
+document.getElementById("recommendTitle").innerText =
+"स्मार्ट सुझाव";
+
+document.getElementById("printBtn").innerText =
+"🖨️ प्रिंट / PDF सेव करें";
+
+document.getElementById("reportSubtitle").innerText =
+"मिट्टी जांच और सामान्य सुझाव";
+
+document.getElementById("warning").innerText =
+"⚠️ यह ऐप दी गई soil-test values के आधार पर सामान्य जानकारी देता है। वास्तविक fertilizer application के लिए proper soil test और स्थानीय कृषि सलाह का उपयोग करें।";
+
+}
+
+else{
+
+document.getElementById("headerSubtitle").innerText =
+"Check your soil health easily";
+
+document.getElementById("formTitle").innerText =
+"Soil Test Details";
+
+document.getElementById("farmerLabel").innerText =
+"Farmer Name";
+
+document.getElementById("villageLabel").innerText =
+"Village";
+
+document.getElementById("dateLabel").innerText =
+"Date";
+
+document.getElementById("cropLabel").innerText =
+"Select Crop";
+
+document.getElementById("stageLabel").innerText =
+"Crop Stage";
+
+document.getElementById("farmerName").placeholder =
+"Enter farmer name";
+
+document.getElementById("village").placeholder =
+"Enter village name";
+
+document.getElementById("checkButton").innerText =
+"Check Soil Health";
+
+document.getElementById("farmerDetailsTitle").innerText =
+"Farmer Details";
+
+document.getElementById("rFarmerLabel").innerText =
+"Farmer Name:";
+
+document.getElementById("rVillageLabel").innerText =
+"Village:";
+
+document.getElementById("rDateLabel").innerText =
+"Date:";
+
+document.getElementById("rCropLabel").innerText =
+"Crop:";
+
+document.getElementById("rStageLabel").innerText =
+"Crop Stage:";
+
+document.getElementById("soilResultTitle").innerText =
+"Soil Health Result";
+
+document.getElementById("recommendTitle").innerText =
+"Smart Recommendation";
+
+document.getElementById("printBtn").innerText =
+"🖨️ Print / Save as PDF";
+
+document.getElementById("reportSubtitle").innerText =
+"Soil analysis and general recommendation";
+
+document.getElementById("warning").innerText =
+"This app provides general guidance based on entered soil-test values. For actual fertilizer application, use a proper soil test and local agricultural recommendations.";
+
+}
+
+}
+
+
+// -------------------------
+// CHECK SOIL
+// -------------------------
+
+function checkSoil(){
+
+
+let farmer =
+document.getElementById("farmerName").value.trim();
+
+let village =
+document.getElementById("village").value.trim();
+
+let date =
+document.getElementById("date").value;
+
+let crop =
+document.getElementById("crop").value;
+
+let stage =
+document.getElementById("stage").value;
+
+let ph =
+parseFloat(document.getElementById("ph").value);
+
+let n =
+parseFloat(document.getElementById("n").value);
+
+let p =
+parseFloat(document.getElementById("p").value);
+
+let k =
+parseFloat(document.getElementById("k").value);
+
+let zn =
+parseFloat(document.getElementById("zn").value);
+
+let fe =
+parseFloat(document.getElementById("fe").value);
+
+
+// -------------------------
+// VALIDATION
+// -------------------------
+
+if(
+isNaN(ph) ||
+isNaN(n) ||
+isNaN(p) ||
+isNaN(k) ||
+isNaN(zn) ||
+isNaN(fe)
+){
+
+if(language === "hi"){
+
+alert("कृपया सभी soil test values भरें।");
+
+}
+else{
+
+alert("Please enter all soil test values.");
+
+}
+
+return;
+
+}
+
+
+// -------------------------
+// CROP NAME
+// -------------------------
+
+let cropNames = {
+
+orange:"Orange",
+
+wheat:"Wheat",
+
+soybean:"Soybean",
+
+chilli:"Chilli"
+
+};
+
+
+// -------------------------
+// REPORT DETAILS
+// -------------------------
+
+document.getElementById("rFarmer").innerText =
+farmer || "-";
+
+document.getElementById("rVillage").innerText =
+village || "-";
+
+document.getElementById("rDate").innerText =
+date || "-";
+
+document.getElementById("rCrop").innerText =
+cropNames[crop];
+
+document.getElementById("rStage").innerText =
+stages[crop][stage];
+
+
+// -------------------------
+// SOIL RESULT
+// -------------------------
+
+let result = "";
+
+let lowN = n < 280;
+let lowP = p < 10;
+let lowK = k < 110;
+let lowZn = zn < 0.6;
+let lowFe = fe < 4.5;
+
+
+// pH
+
+if(ph < 6.5){
+
+result +=
+"🔴 Soil pH: Acidic<br>";
+
+}
+else if(ph <= 7.5){
+
+result +=
+"🟢 Soil pH: Normal<br>";
+
+}
+else{
+
+result +=
+"🟠 Soil pH: Alkaline<br>";
+
+}
+
+
+// N
+
+if(lowN){
+
+result +=
+"🔴 Nitrogen (N): Low<br>";
+
+}
+else{
+
+result +=
+"🟢 Nitrogen (N): Normal<br>";
+
+}
+
+
+// P
+
+if(lowP){
+
+result +=
+"🔴 Phosphorus (P): Low<br>";
+
+}
+else{
+
+result +=
+"🟢 Phosphorus (P): Normal<br>";
+
+}
+
+
+// K
+
+if(lowK){
+
+result +=
+"🔴 Potassium (K): Low<br>";
+
+}
+else{
+
+result +=
+"🟢 Potassium (K): Normal<br>";
+
+}
+
+
+// Zn
+
+if(lowZn){
+
+result +=
+"🔴 Zinc (Zn): Low<br>";
+
+}
+else{
+
+result +=
+"🟢 Zinc (Zn): Normal<br>";
+
+}
+
+
+// Fe
+
+if(lowFe){
+
+result +=
+"🔴 Iron (Fe): Low<br>";
+
+}
+else{
+
+result +=
+"🟢 Iron (Fe): Normal<br>";
+
+}
+
+
+document.getElementById("result").innerHTML =
+result;
+
+
+// -------------------------
+// SMART RECOMMENDATION
+// -------------------------
+
+let recommendation = "";
+
+
+// HINDI
+
+if(language === "hi"){
+
+recommendation +=
+"<b>फसल:</b> " +
+cropNames[crop] +
+"<br>";
+
+recommendation +=
+"<b>फसल की अवस्था:</b> " +
+stages[crop][stage] +
+"<br><br>";
+
+
+recommendation +=
+"<b>पोषक तत्वों पर ध्यान:</b><br><br>";
+
+
+if(lowN){
+
+recommendation +=
+"🔴 Nitrogen कम है — नाइट्रोजन पोषण पर ध्यान दें।<br>";
+
+}
+
+if(lowP){
+
+recommendation +=
+"🔴 Phosphorus कम है — फॉस्फोरस पोषण पर ध्यान दें।<br>";
+
+}
+
+if(lowK){
+
+recommendation +=
+"🔴 Potassium कम है — पोटैशियम पोषण पर ध्यान दें।<br>";
+
+}
+
+if(lowZn){
+
+recommendation +=
+"🔴 Zinc कम है — जिंक की कमी को सुधारने पर ध्यान दें।<br>";
+
+}
+
+if(lowFe){
+
+recommendation +=
+"🔴 Iron कम है — आयरन की कमी को सुधारने पर ध्यान दें।<br>";
+
+}
+
+
+if(
+!lowN &&
+!lowP &&
+!lowK &&
+!lowZn &&
+!lowFe
+){
+
+recommendation +=
+"🟢 दिए गए मानों के अनुसार कोई प्रमुख कमी नहीं मिली।<br>";
+
+}
+
+
+recommendation +=
+"<br><b>सामान्य सुझाव:</b><br>";
+
+
+if(crop === "orange"){
+
+recommendation +=
+"🍊 Orange: इस अवस्था में balanced nutrition और उचित irrigation management पर ध्यान दें।<br>";
+
+}
+
+else if(crop === "wheat"){
+
+recommendation +=
+"🌾 Wheat: फसल की अवस्था के अनुसार balanced nutrition और irrigation management रखें।<br>";
+
+}
+
+else if(crop === "soybean"){
+
+recommendation +=
+"🌱 Soybean: balanced nutrition और उचित moisture management पर ध्यान दें।<br>";
+
+}
+
+else if(crop === "chilli"){
+
+recommendation +=
+"🌶️ Chilli: balanced NPK और micronutrient management पर ध्यान दें।<br>";
+
+}
+
+
+recommendation +=
+"<br>⚠️ Exact fertilizer quantity soil-test report, soil type, crop stage और स्थानीय कृषि recommendation के आधार पर तय करें।";
+
+}
+
+
+// ENGLISH
+
+else{
+
+recommendation +=
+"<b>Crop:</b> " +
+cropNames[crop] +
+"<br>";
+
+recommendation +=
+"<b>Crop Stage:</b> " +
+stages[crop][stage] +
+"<br><br>";
+
+
+recommendation +=
+"<b>Nutrients to focus on:</b><br><br>";
+
+
+if(lowN){
+
+recommendation +=
+"🔴 Nitrogen is low — focus on nitrogen nutrition.<br>";
+
+}
+
+if(lowP){
+
+recommendation +=
+"🔴 Phosphorus is low — focus on phosphorus nutrition.<br>";
+
+}
+
+if(lowK){
+
+recommendation +=
+"🔴 Potassium is low — focus on potassium nutrition.<br>";
+
+}
+
+if(lowZn){
+
+recommendation +=
+"🔴 Zinc is low — focus on zinc deficiency management.<br>";
+
+}
+
+if(lowFe){
+
+recommendation +=
+"🔴 Iron is low — focus on iron deficiency management.<br>";
+
+}
+
+
+if(
+!lowN &&
+!lowP &&
+!lowK &&
+!lowZn &&
+!lowFe
+){
+
+recommendation +=
+"🟢 No major deficiency detected from the entered values.<br>";
+
+}
+
+
+recommendation +=
+"<br><b>General Crop Suggestion:</b><br>";
+
+
+if(crop === "orange"){
+
+recommendation +=
+"🍊 Orange: Focus on balanced nutrition and proper irrigation management at this stage.<br>";
+
+}
+
+else if(crop === "wheat"){
+
+recommendation +=
+"🌾 Wheat: Maintain balanced nutrition and proper irrigation according to crop stage.<br>";
+
+}
+
+else if(crop === "soybean"){
+
+recommendation +=
+"🌱 Soybean: Focus on balanced nutrition and proper moisture management.<br>";
+
+}
+
+else if(crop === "chilli"){
+
+recommendation +=
+"🌶️ Chilli: Focus on balanced NPK and micronutrient management.<br>";
+
+}
+
+
+recommendation +=
+"<br>⚠️ Exact fertilizer quantity should be decided using the soil-test report, soil type, crop stage and local agricultural recommendations.";
+
+}
+
+
+document.getElementById("recommendation").innerHTML =
+recommendation;
+
+
+// -------------------------
+// SHOW REPORT
+// -------------------------
+
+document.getElementById("report").style.display =
+"block";
+
+
+}
+
+
+// -------------------------
+// START
+// -------------------------
+
+updateStages();
+
+</script>
+
+
+</body>
+</html>
